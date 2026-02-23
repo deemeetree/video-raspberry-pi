@@ -87,8 +87,58 @@ dystemctl activate player.service
 ```
 
 
-## Cheatsheet
+## Quitting the Service
 
-To quit: press q
+Usually, it should work to quit if you:
+press q
+press Alt+F2 or Alt+F4
 
-If the above works, you can now 
+However, it doesn't always work. 
+
+In that case, you should have access to Pi via SSH (e.g. if you plug it in Ethernet or if it catches WiFi) and run 
+
+```
+sudo systemctl disable player.service
+```
+
+If there's no possibility to go via SSH, install `Paragon extFS` on your Mac, then mount the SD card on the Mac, and open manually:
+
+```
+ls /Volumes/rootfs/etc/systemd/system/
+```
+
+Where `/rootfs` is the path to the SD card rom Mac
+
+This lists `systemctl` services.
+
+Then you "mask" the service so it doesn't auto-launch by creating a fake symlink to it:
+
+```
+sudo ln -s /dev/null /Volumes/rootfs/etc/systemd/system/graphical.target.wants/player.service
+```
+
+NOTE: This above may not work, then use:
+
+```
+sudo mv /Volumes/rootfs/etc/systemd/system/player.service /Volumes/rootfs/etc/systemd/system/player.service.bak
+```
+
+(if you're in SSH, run):
+
+```
+sudo systemctl mask player.service
+```
+
+Then to "unmmask" you run:
+
+```
+sudo rm /etc/systemd/system/graphical.target.wants/player.service
+```
+
+(if you're in SSH, run):
+
+```
+sudo systemctl unmask player.service
+```
+
+
