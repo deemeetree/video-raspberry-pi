@@ -231,10 +231,16 @@ Then add this content there:
 /home/pi/launch_parallel.sh "omxplayer --no-keys --display 2 --loop /home/pi/Desktop/BMML-Body.mp4" "omxplayer --no-keys --display 7 --loop /home/pi/Desktop/BBML-Machine.mp4"
 ```
 
-IMPORTANT - if you want to be able to quit the video, do not add `--no-keys`:
+IMPORTANT - if you want to be able to quit the video, do not add --no-keys
 
 ```
 /home/pi/launch_parallel.sh "omxplayer --no-keys --display 2 --loop /home/pi/Desktop/BMML-Body.mp4" "omxplayer --display 7 --loop /home/pi/Desktop/BBML-Machine.mp4"
+```
+
+Or also just comment out for now:
+
+```
+# /home/pi/launch_parallel.sh "omxplayer --no-keys --display 2 --loop /home/pi/Desktop/BMML-Body.mp4" "omxplayer --display 7 --loop /home/pi/Desktop/BBML-Machine.mp4"
 ```
 
 6. Check if exists / create the `launch_parallel.sh` file:
