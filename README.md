@@ -59,7 +59,13 @@ where `--display 2` means HDMI0 port and `--display 7` means HDMI1 port (on Pi 4
 
 ## Making it launch on startup
 
-In `/etc/systemd/service`:
+In `/etc/systemd/service` you are creating the `player.service` file:
+
+```
+nano /etc/systemd/service/player.service`
+```
+
+Then adding the following:
 
 ```
 [Unit]
@@ -145,7 +151,9 @@ sudo systemctl unmask player.service
 
 ## No Sleep Setup
 
-This is considering we're doing it from Pi. If we're on Mac, add `/Volumes/rootfs` prefix (or whatever the disk is).
+This is additional setup that avoids the service going to sleep and relaunches it. For some reason it also automatically starts the service upon startup. 
+
+Below we assume we're doing it from Pi. If we're on Mac, add `/Volumes/rootfs` prefix (or whatever the disk is).
 
 1. Check if there's a `nosleep.service` file somewhere:
 
@@ -212,7 +220,7 @@ sleep 30
 chmod +x /home/pi/nosleep.sh
 ```
 
-5. Create the actual `play.sh` file:
+5. Check if exists / or create the actual `play.sh` file:
 
 ```
 nano /home/pi/play.sh
@@ -229,7 +237,7 @@ IMPORTANT - if you want to be able to quit the video, do not add `--no-keys`:
 /home/pi/launch_parallel.sh "omxplayer --no-keys --display 2 --loop /home/pi/Desktop/BMML-Body.mp4" "omxplayer --display 7 --loop /home/pi/Desktop/BBML-Machine.mp4"
 ```
 
-6. Create the `launch_parallel.sh` file:
+6. Check if exists / create the `launch_parallel.sh` file:
 
 ```
 nano /home/pi/launch_parallel.sh
@@ -261,7 +269,7 @@ Make it executable:
 chmod +x /home/pi/launch_parallel.sh
 ```
 
-5. To verify it's enabled:
+6. To verify it's enabled:
 ```
 sudo systemctl status nosleep.service
 ```
