@@ -1,5 +1,7 @@
 # Dual Screen Raspberry Pi Video Setup
 
+### IMPORTANT: There are two ways to launch it. Below is a quick one, after is really the one that never stops and never sleeps. 
+
 Making a video kiosk out of Raspberry Pi to play 2 videos on startup.
 
 ## 1. Check if OMXPlayer exists
@@ -139,6 +141,129 @@ sudo rm /etc/systemd/system/graphical.target.wants/player.service
 
 ```
 sudo systemctl unmask player.service
+```
+
+## No Sleep Setup
+
+This is considering we're doing it from Pi. If we're on Mac, add `/Volumes/rootfs` prefix (or whatever the disk is).
+
+1. Check if there's a `nosleep.service` file somewhere:
+
+```
+find /lib/systemd/system/ -name "nosleep*"
+find /etc/systemd/system/ -name "nosleep*"
+```
+
+2. Once found, go to step 3). Or create if it doesn't exist:
+
+```
+nano /etc/systemd/system/nosleep.service
+```
+
+3. Add the following to the file
+
+```
+[Unit]
+Description=Chromium Kiosk
+Wants=graphical.target
+After=graphical.target
+
+[Service]
+Environment=XAUTHORITY=/home/pi/.Xauthority
+Type=simple
+ExecStart=/bin/bash /home/pi/nosleep.sh
+Restart=on-abort
+User=pi
+Group=pi
+
+[Install]
+WantedBy=graphical.target
+
+```
+
+4. Create a symlink in `graphical.target.wants`
+
+```
+sudo systemctl daemon-reload
+sudo systemctl enable nosleep.service
+```
+
+5. Create the `nosleep.sh` script
+
+```
+nano /home/pi/nosleep.sh
+```
+
+6. Add this to the file
+
+```
+#!/bin/bash
+xset s noblank
+xset s off
+xset -dpms
+
+sleep 30
+
+/home/pi/play.sh
+```
+
+4. Make it executable:
+```
+chmod +x /home/pi/nosleep.sh
+```
+
+5. Create the actual `play.sh` file:
+
+```
+nano /home/pi/play.sh
+```
+
+Then add this content there:
+```
+/home/pi/launch_parallel.sh "omxplayer --no-keys --display 2 --loop /home/pi/Desktop/BMML-Body.mp4" "omxplayer --no-keys --display 7 --loop /home/pi/Desktop/BBML-Machine.mp4"
+```
+
+IMPORTANT - if you want to be able to quit the video, do not add `--no-keys`:
+
+```
+/home/pi/launch_parallel.sh "omxplayer --no-keys --display 2 --loop /home/pi/Desktop/BMML-Body.mp4" "omxplayer --display 7 --loop /home/pi/Desktop/BBML-Machine.mp4"
+```
+
+6. Create the `launch_parallel.sh` file:
+
+```
+nano /home/pi/launch_parallel.sh
+```
+
+Add this: 
+
+```
+#!/bin/bash
+
+for cmd in "$@"; do {
+  echo "Process \"$cmd\" started";
+  $cmd & pid=$!
+  PID_LIST+=" $pid";
+} done
+
+trap "kill $PID_LIST" SIGINT
+
+echo "Parallel processes have started";
+
+wait $PID_LIST
+
+echo
+echo "All processes have completed";
+```
+
+Make it executable:
+```
+chmod +x /home/pi/launch_parallel.sh
+```
+
+5. To verify it's enabled:
+```
+sudo systemctl status nosleep.service
 ```
 
 
